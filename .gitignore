@@ -6,6 +6,8 @@
 
 ssl
 
+DatingApp.db
+
 # User-specific files
 *.rsuser
 *.suo

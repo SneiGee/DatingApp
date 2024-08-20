@@ -1,11 +1,9 @@
-namespace API.Entities
-{
-    public class UserLike
-    {
-        public AppUser SourceUser { get; set; }
-        public int SourceUserId { get; set; }
+namespace API.Entities;
 
-        public AppUser LikedUser { get; set; }
-        public int LikedUserId { get; set; }
-    }
+public class UserLike
+{
+    public AppUser SourceUser { get; set; } = null!;
+    public int SourceUserId { get; set; }
+    public AppUser TargetUser { get; set; } = null!;
+    public int TargetUserId { get; set; }
 }

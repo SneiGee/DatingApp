@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
@@ -8,56 +6,55 @@ using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers
+namespace API.Controllers;
+
+[Authorize]
+public class LikesController(IUnitOfWork unitOfWork) : BaseApiController
 {
-    [Authorize]
-    public class LikesController : BaseApiController
+    [HttpPost("{targetUserId:int}")]
+    public async Task<ActionResult> ToggleLike(int targetUserId)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public LikesController(IUnitOfWork unitOfWork)
+        var sourceUserId = User.GetUserId();
+
+        if (sourceUserId == targetUserId) return BadRequest("You cannot like yourself");
+
+        var existingLike = await unitOfWork.LikesRepository.GetUserLike(sourceUserId, targetUserId);
+
+        if (existingLike == null)
         {
-            _unitOfWork = unitOfWork;
-        }
-
-        [HttpPost("{username}")]
-        public async Task<ActionResult> AddLike(string username)
-        {
-            var sourceUserId = User.GetUserId();
-            var likeUser = await _unitOfWork.UserRepository.GetUserByUsername(username);
-            var sourceUser = await _unitOfWork.LikesRepository.GetUserWithLikes(sourceUserId);
-
-            if (likeUser == null) return BadRequest();
-
-            if (sourceUser.UserName == username) return BadRequest("You cannot like your self");
-
-            var userLike = await _unitOfWork.LikesRepository.GetUserLike(sourceUserId, likeUser.Id);
-
-            if (userLike != null) return BadRequest("You already like this user");
-
-            userLike = new UserLike
+            var like = new UserLike
             {
                 SourceUserId = sourceUserId,
-                LikedUserId = likeUser.Id
+                TargetUserId = targetUserId
             };
 
-            sourceUser.LikedUsers.Add(userLike);
-
-            if (await _unitOfWork.Complete()) return Ok();
-
-            return BadRequest("Failed to like user");
-
+            unitOfWork.LikesRepository.AddLike(like);
         }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes([FromQuery] LikesParams likesParams)
+        else 
         {
-            likesParams.UserId = User.GetUserId();
-            var users = await _unitOfWork.LikesRepository.GetUserLikes(likesParams);
-
-            Response.AddPaginationHeader(users.CurrentPage, users.PageSize,
-                users.TotalCount, users.TotalPages);
-
-            return Ok(users);
+            unitOfWork.LikesRepository.DeleteLike(existingLike);
         }
+
+        if (await unitOfWork.Complete()) return Ok();
+
+        return BadRequest("Failed to update like");
+
+    }
+
+    [HttpGet("list")]
+    public async Task<ActionResult<IEnumerable<int>>> GetCurrentUserLikeIds()
+    {
+        return Ok(await unitOfWork.LikesRepository.GetCurrentUserLikeIds(User.GetUserId()));
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<MemberDto>>> GetUserLikes([FromQuery] LikesParams likesParams)
+    {
+        likesParams.UserId = User.GetUserId();
+        var users = await unitOfWork.LikesRepository.GetUserLikes(likesParams);
+
+        Response.AddPaginationHeader(users);
+
+        return Ok(users);
     }
 }

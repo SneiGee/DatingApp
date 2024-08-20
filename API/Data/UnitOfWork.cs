@@ -4,30 +4,29 @@ using AutoMapper;
 
 namespace API.Data
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork(DataContext context, IUserRepository userRepository,
+        ILikesRepository likesRepository, IMessageRepository messageRepository,
+        IPhotoRepository photoRepository) : IUnitOfWork
     {
-        private readonly IMapper _mapper;
-        private readonly DataContext _context;
-        public UnitOfWork(DataContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
 
-        public IUserRepository UserRepository => new UserRepository(_context, _mapper);
+        public IUserRepository UserRepository => userRepository;
 
-        public IMessageRepository MessageRepository => new MessageRepository(_context, _mapper);
+        public IMessageRepository MessageRepository => messageRepository;
 
-        public ILikesRepository LikesRepository => new LikesRepository(_context);
+        public ILikesRepository LikesRepository => likesRepository;
+
+
+        public IPhotoRepository PhotoRepository => photoRepository;
+
 
         public async Task<bool> Complete()
         {
-            return await _context.SaveChangesAsync() > 0;
+            return await context.SaveChangesAsync() > 0;
         }
 
         public bool HasChanges()
         {
-            return _context.ChangeTracker.HasChanges();
+            return context.ChangeTracker.HasChanges();
         }
     }
 }
