@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,37 +7,34 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Extensions;
 
-public static class IdentityServiceExtension
+public static class IdentityServiceExtensions
 {
     public static IServiceCollection AddIdentityServices(this IServiceCollection services,
         IConfiguration config)
     {
-        services.AddIdentityCore<AppUser>(opt => 
+        services.AddIdentityCore<AppUser>(opt =>
         {
             opt.Password.RequireNonAlphanumeric = false;
-            opt.Password.RequireDigit = false;
         })
             .AddRoles<AppRole>()
             .AddRoleManager<RoleManager<AppRole>>()
-            // .AddSignInManager<SignInManager<AppUser>>()
-            // .AddRoleValidator<RoleValidator<AppRole>>()
             .AddEntityFrameworkStores<DataContext>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options => 
+            .AddJwtBearer(options =>
             {
-                var tokenKey = config["TokenKey"] ?? throw new Exception("Token is not found!");
+                var tokenKey = config["TokenKey"] ?? throw new Exception("TokenKey not found");
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
                     ValidateIssuer = false,
-                    ValidateAudience = false,
+                    ValidateAudience = false
                 };
 
                 options.Events = new JwtBearerEvents
                 {
-                    OnMessageReceived = context =>
+                    OnMessageReceived = context => 
                     {
                         var accessToken = context.Request.Query["access_token"];
 
@@ -51,7 +48,7 @@ public static class IdentityServiceExtension
                     }
                 };
             });
-        
+
         services.AddAuthorizationBuilder()
             .AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"))
             .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));

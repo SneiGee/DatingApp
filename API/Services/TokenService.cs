@@ -6,7 +6,7 @@ using API.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
-namespace API.Services;
+namespace API;
 
 public class TokenService(IConfiguration config, UserManager<AppUser> userManager) : ITokenService
 {

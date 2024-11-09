@@ -17,6 +17,7 @@ public static class ApplicationServiceExtension
         {
             options.UseSqlite(config.GetConnectionString("DefaultConnection"));
         });
+        services.AddCors();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ILikesRepository, LikesRepository>();
@@ -25,8 +26,8 @@ public static class ApplicationServiceExtension
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPhotoService, PhotoService>();
         services.AddScoped<LogUserActivity>();
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
-        services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
         services.AddSignalR();
         services.AddSingleton<PresenceTracker>();
 
