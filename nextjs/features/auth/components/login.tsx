@@ -2,7 +2,7 @@
 
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { loginAction } from "../server/login";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,14 @@ export function Login() {
     const [password, setPassword] = useState("");
     const router = useRouter();
     const { toast } = useToast();
+
+    useEffect(() => {
+        // Check for token on page load and redirect if it exists
+        const token = localStorage.getItem("token");
+        if (token) {
+            router.push("/");
+        }
+    }, [router]);
 
     const clientAction = async (e: React.FormEvent) => {
         e.preventDefault();

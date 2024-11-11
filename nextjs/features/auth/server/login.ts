@@ -39,6 +39,12 @@ export async function loginAction(formData: {
 
         // Parse the response JSON
         const data = await response.json();
+        
+        // Store the token and user data in localStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("knownAs", data.knownAs);
+        localStorage.setItem("gender", data.gender);
 
         return {
             success: true,
