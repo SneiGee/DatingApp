@@ -1,19 +1,11 @@
-// interface User {
-//     username: string;
-//     knownAs: string;
-//     gender: string;
-//     token: string;
-// }
+import { UserProp } from "@/types/auth";
 
 export function useAuth() {
-    const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
-    const knownAs = localStorage.getItem("knownAs");
-    const gender = localStorage.getItem("gender");
-
-    const user = token && username && knownAs && gender
-        ? { token, username, knownAs, gender }
-        : null;
+    // Retrieve user data from localStorage if available
+    const user: UserProp | null = (() => {
+        const storedUser = localStorage.getItem("user");
+        return storedUser ? JSON.parse(storedUser) : null;
+    })();
 
     return { user, isLoggedIn: Boolean(user) };
 }

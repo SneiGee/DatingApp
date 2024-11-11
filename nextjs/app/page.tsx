@@ -16,12 +16,12 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (typeof window !== "undefined" && !isLoggedIn) {
       router.push("/login");
     }
   }, [isLoggedIn, router]);
 
-  if (!isLoggedIn) return null; // Wait for redirect if not logged in
+  if (typeof window !== "undefined" && !isLoggedIn) return null; // Wait for redirect if not logged in
 
   return (
     <Card className="mx-auto max-w-md p-6 mt-10">

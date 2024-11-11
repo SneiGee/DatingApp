@@ -24,7 +24,7 @@ export function Login() {
 
     useEffect(() => {
         // Check for token on page load and redirect if it exists
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("user");
         if (token) {
             router.push("/");
         }
@@ -61,42 +61,44 @@ export function Login() {
         }
     };
     return (
-        <Card className="mx-auto max-w-sm">
-            <CardHeader>
-                <CardTitle className="text-2xl">Login</CardTitle>
-                <CardDescription>
-                    Enter your email below to login to your account
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={clientAction} className="grid gap-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="username"
-                            type="username"
-                            placeholder="m@example.com"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
+        <>
+            <Card className="mx-auto max-w-sm">
+                <CardHeader>
+                    <CardTitle className="text-2xl">Login</CardTitle>
+                    <CardDescription>
+                        Enter your email below to login to your account
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={clientAction} className="grid gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                id="username"
+                                type="username"
+                                placeholder="m@example.com"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
                         </div>
-                        <Input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required />
-                    </div>
-                    <Button type="submit" className="w-full">
-                        Login
-                    </Button>
-                </form>
-            </CardContent>
-        </Card>
+                        <div className="grid gap-2">
+                            <div className="flex items-center">
+                                <Label htmlFor="password">Password</Label>
+                            </div>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required />
+                        </div>
+                        <Button type="submit" className="w-full">
+                            Login
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
+        </>
     );
 }

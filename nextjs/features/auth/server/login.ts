@@ -1,5 +1,6 @@
 "user server";
 
+import { LoginProp, UserProp } from "@/types/auth";
 import { z } from "zod";
 
 // Define the Zod schema for validation
@@ -8,10 +9,7 @@ const loginSchema = z.object({
     password: z.string().min(6),
 });
 
-export async function loginAction(formData: {
-    username: string;
-    password: string;
-}) {
+export async function loginAction(formData: LoginProp) {
     // Validate the input data
     const result = loginSchema.safeParse(formData);
     if (!result.success) {
@@ -26,7 +24,6 @@ export async function loginAction(formData: {
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
-                tenant: "root", // Include any other necessary headers
             },
             body: JSON.stringify({ username, password }),
         });
@@ -39,20 +36,21 @@ export async function loginAction(formData: {
 
         // Parse the response JSON
         const data = await response.json();
-        
-        // Store the token and user data in localStorage
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("username", data.username);
-        localStorage.setItem("knownAs", data.knownAs);
-        localStorage.setItem("gender", data.gender);
 
-        return {
-            success: true,
+        // Create user object to store in localStorage
+        const user: UserProp = {
             token: data.token,
             username: data.username,
-            knownAd: data.knownAd,
+            firstName: data.firstName,
+            knownAs: data.knownAs,
             gender: data.gender,
+            roles: data.roles,
         };
+        
+        // Store user object as JSON string in localStorage
+        localStorage.setItem("user", JSON.stringify(user));
+
+        return { success: true, user };
     } catch (error) {
         // Improved error handling
         let errorMessage = "An unexpected error occurred"; // Default error message
